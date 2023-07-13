@@ -20,7 +20,7 @@ contract TN7ProductionMint is
     string public baseURI; 
     string public tokenURISuffix;
     uint256 public constant MAX_SUPPLY = 777;    
-    uint256 public constant MAX_PER_FC = 2;
+    uint256 public constant MAX_PER_FREE = 2;
     uint256 public constant MAX_PER_ADDRESS_WL = 2;
     uint256 public constant MAX_PER_ADDRESS_PUB = 1;
 
@@ -33,7 +33,7 @@ contract TN7ProductionMint is
     uint256 public constant publicPrice = 0.07 ether;
     uint256 public totalMinted;
 
-    address public constant FC_NFT_PROXY = 0x0;
+    address public constant FREE_NFT_PROXY = 0x0;
 
     bytes32 public merkleRoot;
 
@@ -75,16 +75,16 @@ contract TN7ProductionMint is
     }
 
     function _isFortuneCookiesHolder(address _user) internal view returns(bool) {
-        IERC721AUpgradeable fcContract = IERC721AUpgradeable(FC_NFT_PROXY);
-        return fcContract.balanceOf(_user) == 1;
+        IERC721AUpgradeable freeMintContract = IERC721AUpgradeable(FREE_NFT_PROXY);
+        return freeMintContract.balanceOf(_user) == 1;
     }
 
     // Mint status query
     function getMintStatus(address _user) public view returns (MintQuota memory) {
         if (block.timestamp <= fortuneCookiesEnd) {
             return MintQuota(
-                MAX_PER_FC - mintedAccountsB4Pub[_user],
-                MAX_PER_FC,
+                MAX_PER_FREE - mintedAccountsB4Pub[_user],
+                MAX_PER_FREE,
                 fortuneCookiesPrice
             );
         } else if (block.timestamp <= waitlistEnd) {
@@ -132,7 +132,7 @@ contract TN7ProductionMint is
                 "Sorry, you don't own any fortune cookies, please come back later."
             );
             require(
-                mintedAccountsB4Pub[msg.sender] + _quantity <= MAX_PER_FC,
+                mintedAccountsB4Pub[msg.sender] + _quantity <= MAX_PER_FREE,
                 "Sorry, you have minted all your quota in non-public round."
             ); 
             require(
