@@ -17,8 +17,8 @@ contract TheRyuCouncil is
     string public baseURI;
     string public tokenURISuffix;
 
-    uint256 public MAX_SUPPLY = 777;
-    uint256 public MAX_PER_ADDRESS = 1;
+    uint256 public MAX_SUPPLY;
+    uint256 public MAX_PER_ADDRESS;
 
     uint256 public whitelistStart;
     uint256 public whitelistEnd;
@@ -38,6 +38,9 @@ contract TheRyuCouncil is
     ) public initializerERC721A initializer {
         __ERC721A_init("TheRyuCouncil", "TRC");
         __Ownable_init();
+
+        MAX_SUPPLY = 777;
+        MAX_PER_ADDRESS = 1;
 
         realOwner = msg.sender;
         baseURI = _coverBaseURI;
@@ -91,6 +94,7 @@ contract TheRyuCouncil is
         );
         _safeMint(_to, _quantity);
         totalMinted += _quantity;
+        mintedAccounts[_to] += _quantity;
     }
 
     function devMint(address[] memory _toList) external onlyOwner {
@@ -99,7 +103,7 @@ contract TheRyuCouncil is
             "TheRyuCouncil: dev mint exceed supply."
         );
         for (uint256 index = 0; index < _toList.length; index++) {
-            _mintBatch(_toList[index], 1);
+            _mintBatch(_toList[index], 1);            
         }
     }
 
@@ -121,7 +125,6 @@ contract TheRyuCouncil is
                 "TheRyuCouncil: Sorry, you are not whitelisted for this round. Come back later!"
             );
             _mintBatch(msg.sender, 1);
-            mintedAccounts[msg.sender] += 1;
         }
         if (block.timestamp >= publicStart) {
             require(
@@ -129,7 +132,6 @@ contract TheRyuCouncil is
                 "TheRyuCouncil: Sorry, you have minted all your quota."
             );
             _mintBatch(msg.sender, 1);
-            mintedAccounts[msg.sender] += 1;
         }
     }
 
